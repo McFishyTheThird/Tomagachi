@@ -13,12 +13,11 @@ public class Tomagachi
     int word;
     string choice = "";
     string teach;
-
+    bool willHeDoIt;
     
     public void Feed()
     {
         Console.WriteLine($"You feed {name}");
-        Console.ReadLine();
         hunger -= 20;
         if(hunger < 0)
         {
@@ -38,7 +37,6 @@ public class Tomagachi
             boredom -= 60;
 
         }
-        Console.ReadLine();
     }
     public void Teach(int word)
     {
@@ -47,8 +45,11 @@ public class Tomagachi
         words.Add($"{teach}");
         Console.WriteLine("");
         Console.WriteLine($"Your Tomagachi learned {teach}");
-        Console.ReadLine();
         criminality--;
+        if(criminality < 0)
+        {
+            criminality = 0;
+        }
     }
     public void Tick()
     {
@@ -64,10 +65,30 @@ public class Tomagachi
                 hunger += 10 * boredom/100;
             }
         }
+        if(choice == "c")
+        {
+            depression++;
+        }
+
+        depression ++;
+
+        if(depression > 10)
+        {
+            depression = 10;
+        }
         
         if(choice != "b" && choice != "c")
         {
-            boredom += 30;
+            if (depression < 3)
+            {
+                boredom+=30;
+            }
+            else
+            {
+                boredom += 30 * depression/2;
+
+            }
+
         }
         
         if(boredom > 200)
@@ -78,14 +99,27 @@ public class Tomagachi
         if(choice != "c")
         {
             criminality += 1;
+            if(criminality> 10)
+            {
+                criminality = 10;
+            }
         }
 
-        if(choice == "c")
+    }
+    private void SayingNo()
+    {
+        if(criminality >= 8)
         {
-            depression++;
+            int crime = generator.Next(0, 100);
+            if(crime < 40)
+            {
+                willHeDoIt = true;
+            }
+            else 
+            {
+                willHeDoIt = false;
+            }
         }
-
-        depression ++;
     }
     public void Play()
     {
@@ -93,14 +127,13 @@ public class Tomagachi
         if(playtime == 3)
         {
             Console.WriteLine("You throw a ball that hits {name} in the face");
-            Console.ReadLine();
+
             depression++;
         }
         else
         {
             Console.WriteLine("You play around");
 
-            Console.ReadLine();
             depression -= 3;
             boredom -= 20;
         }
@@ -124,7 +157,7 @@ public class Tomagachi
         }
         else
         {
-            Console.WriteLine($"{name} is happy");
+            Console.WriteLine($"{name} is not bored");
             Console.WriteLine($"Boredom: {boredom}/200");
             Console.WriteLine("");
         }
@@ -140,16 +173,16 @@ public class Tomagachi
             Console.WriteLine($"Depression: {depression}/10");
             Console.WriteLine("");
         }
-        if(boredom >= 100)
+        if(criminality >= 8)
         {
-            Console.WriteLine($"{name} is bored");
-            Console.WriteLine($"Boredom: {boredom}/200");
+            Console.WriteLine($"{name} is a criminal");
+            Console.WriteLine($"criminality: {criminality}/10");
             Console.WriteLine("");
         }
         else
         {
-            Console.WriteLine($"{name} is happy");
-            Console.WriteLine($"Boredom: {boredom}/200");
+            Console.WriteLine($"{name} is calm");
+            Console.WriteLine($"criminality: {criminality}/10");
             Console.WriteLine("");
         }
         if(hunger >= 50)
@@ -192,19 +225,51 @@ public class Tomagachi
             Choice();
             if (choice == "a")
             {
-                Feed();
+                SayingNo();
+                if(willHeDoIt == true)
+                {
+                    Feed();
+                }
+                else
+                {
+                    Console.WriteLine($"{name} says no");
+                }
             }
             else if (choice == "b")
             {
-                Hi();
+                SayingNo();
+                if(willHeDoIt == true)
+                {
+                    Hi();
+                }
+                else
+                {
+                    Console.WriteLine($"{name} says no");
+                }
             }
             else if (choice == "c")
             {
-                Teach(word);
+                SayingNo();
+                if(willHeDoIt == true)
+                {
+                    Teach(word);
+                }
+                else
+                {
+                    Console.WriteLine($"{name} says no");
+                }
             }
             else if (choice == "d")
             {
-                Play();
+                SayingNo();
+                if(willHeDoIt == true)
+                {
+                    Play();
+                }
+                else
+                {
+                    Console.WriteLine($"{name} says no");
+                }
             }
             else
             {
@@ -214,6 +279,7 @@ public class Tomagachi
             Tick();
             GetAlive();
             Console.Clear();
+            Console.ReadLine();
         }
     }
 
@@ -235,6 +301,7 @@ public class Tomagachi
         Console.WriteLine($"A: Feed {name}");
         Console.WriteLine($"B: Talk with {name}");
         Console.WriteLine($"C: Teach {name} a word");
+        Console.WriteLine($"D: Play with {name}");
         choice = Console.ReadLine().ToLower();
         Console.Clear();
     }
