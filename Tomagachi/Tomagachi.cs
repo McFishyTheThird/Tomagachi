@@ -4,6 +4,8 @@ public class Tomagachi
 {
     private int hunger = 0;
     private int boredom = 0;
+    private int criminality = 0;
+    private int depression = 0;
     private List<string> words = new List<string>();
     private bool isAlive = true;
     private Random generator = new();
@@ -33,7 +35,7 @@ public class Tomagachi
         {
             word = generator.Next(0, words.Count);
             Console.WriteLine($" {name} says, {words[word]}");
-            ReduceBoredom();
+            boredom -= 60;
 
         }
         Console.ReadLine();
@@ -46,6 +48,7 @@ public class Tomagachi
         Console.WriteLine("");
         Console.WriteLine($"Your Tomagachi learned {teach}");
         Console.ReadLine();
+        criminality--;
     }
     public void Tick()
     {
@@ -71,9 +74,72 @@ public class Tomagachi
         {
             boredom = 200;
         }
+
+        if(choice != "c")
+        {
+            criminality += 1;
+        }
+
+        if(choice == "c")
+        {
+            depression++;
+        }
+
+        depression ++;
+    }
+    public void Play()
+    {
+        int playtime = generator.Next(0,3);
+        if(playtime == 3)
+        {
+            Console.WriteLine("You throw a ball that hits {name} in the face");
+            Console.ReadLine();
+            depression++;
+        }
+        else
+        {
+            Console.WriteLine("You play around");
+
+            Console.ReadLine();
+            depression -= 3;
+            boredom -= 20;
+        }
+        if(boredom < 100)
+        {
+
+            hunger += 10;
+        }
+        else if(boredom > 100)
+        {
+            hunger += 10 * boredom/100;
+        }
     }
     public void PrintStats()
     {
+        if(boredom >= 100)
+        {
+            Console.WriteLine($"{name} is bored");
+            Console.WriteLine($"Boredom: {boredom}/200");
+            Console.WriteLine("");
+        }
+        else
+        {
+            Console.WriteLine($"{name} is happy");
+            Console.WriteLine($"Boredom: {boredom}/200");
+            Console.WriteLine("");
+        }
+        if(depression >= 3)
+        {
+            Console.WriteLine($"{name} is sad");
+            Console.WriteLine($"Depression: {depression}/10");
+            Console.WriteLine("");
+        }
+        else
+        {
+            Console.WriteLine($"{name} is happy");
+            Console.WriteLine($"Depression: {depression}/10");
+            Console.WriteLine("");
+        }
         if(boredom >= 100)
         {
             Console.WriteLine($"{name} is bored");
@@ -116,14 +182,6 @@ public class Tomagachi
             isAlive = false;
         }
     }
-    public void ReduceBoredom()
-    {
-        boredom -= 40;
-        if (boredom < 0)
-        {
-            boredom = 0;
-        }
-    }
 
     public void Game()
     {
@@ -143,6 +201,10 @@ public class Tomagachi
             else if (choice == "c")
             {
                 Teach(word);
+            }
+            else if (choice == "d")
+            {
+                Play();
             }
             else
             {
