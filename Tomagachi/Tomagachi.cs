@@ -13,7 +13,7 @@ public class Tomagachi
     int word;
     string choice = "";
     string teach;
-    bool willHeDoIt;
+    bool willHeDoIt = true;
     
     public void Feed()
     {
@@ -275,12 +275,13 @@ public class Tomagachi
             {
                 WrongAnswers();
             }
+            Console.ReadLine();
 
             Tick();
             GetAlive();
             Console.Clear();
-            Console.ReadLine();
         }
+        Console.ReadLine();
     }
 
     private void WrongAnswers()
