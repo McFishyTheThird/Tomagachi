@@ -5,6 +5,7 @@ public class Tomagachi
     private int hunger = 0;
     private int boredom = 0;
     private int criminality = 0;
+    private int maxCrime = 10;
     private int depression = 0;
     private int money = 1000;
     private int loan = 0;
@@ -16,6 +17,8 @@ public class Tomagachi
     string choice = "";
     string teach;
     bool willHeDoIt = true;
+    bool choosenTheWay = false;
+    private string crimeClass = "";
     
     public void Feed()
     {
@@ -54,6 +57,10 @@ public class Tomagachi
         {
             criminality = 0;
         }
+        if(crimeClass != "Homicidal Maniac")
+        {
+            depression++;
+        }
         money -= 200;
     }
     public void Tick()
@@ -72,21 +79,13 @@ public class Tomagachi
         }
         if (loan > 0)
         {
-            money = money * loan/100;
+            money -= money * loan/1500;
             loan -= 100;
         }
-        if(choice == "c")
+        if(crimeClass != "Homicidal Maniac")
         {
             depression++;
         }
-
-        depression ++;
-
-        if(depression > 10)
-        {
-            depression = 10;
-        }
-        
         if(choice != "b" && choice != "c")
         {
             if (depression < 3)
@@ -100,38 +99,52 @@ public class Tomagachi
             }
 
         }
-        
+        if(choice != "c")
+        {
+            criminality += 1;
+        }
         if(boredom > 200)
         {
             boredom = 200;
         }
-
-        if(choice != "c")
+        if (boredom <= 0)
         {
-            criminality += 1;
-            if(criminality> 10)
+            boredom = 0;
+        }
+        if(depression > 10)
+        {
+            depression = 10;
+        }
+        if(criminality> maxCrime)
+        {
+            criminality = maxCrime;
+        }
+        if(crimeClass == "Drug Kingpin")
+        {
+            money += 50;
+            if(name == "Walter White" || name == "Mr White" || name == "Waltuh")
             {
-                criminality = 10;
+                money += 100;
+            }
+        }   
+        if(crimeClass == "Homicidal Maniac")
+        {
+            money -= 50;
+        }
+        if(crimeClass == "Illegal Gambler")
+        {
+            int gambling = generator.Next(0,100);
+            if(gambling <= 25)
+            {
+                money = money*3;
+            }
+            else if(gambling >= 50)
+            {
+                money = money/2;
             }
         }
+    }
 
-    }
-    private void SayingNo()
-    {
-        if(criminality >= 8)
-        {
-            int crime = generator.Next(0, 100);
-            if(crime < 40)
-            {
-                willHeDoIt = true;
-            }
-            else 
-            {
-                willHeDoIt = false;
-            }
-        }
-        money -= 50;
-    }
     public void Play()
     {
         int playtime = generator.Next(0,3);
@@ -139,7 +152,10 @@ public class Tomagachi
         {
             Console.WriteLine("You throw a ball that hits {name} in the face");
 
-            depression++;
+            if(crimeClass != "Homicidal Maniac")
+            {
+                depression++;
+            }
         }
         else
         {
@@ -177,58 +193,39 @@ public class Tomagachi
         money += 1000;
         loan += 1000;
     }
+    private void SayNo()
+    {
+        int noChance = generator.Next(0,100);
+        if(noChance <= 40)
+        {
+            willHeDoIt = false;
+        }
+        else
+        {
+            willHeDoIt = true;
+        }
+    }
     public void PrintStats()
     {
         Console.WriteLine($"Money: {money}");
-        if(boredom >= 100)
+        if (crimeClass != "")
         {
-            Console.WriteLine($"{name} is bored");
-            Console.WriteLine($"Boredom: {boredom}/200");
-            Console.WriteLine("");
+
         }
-        else
-        {
-            Console.WriteLine($"{name} is not bored");
-            Console.WriteLine($"Boredom: {boredom}/200");
-            Console.WriteLine("");
-        }
-        if(depression >= 3)
-        {
-            Console.WriteLine($"{name} is sad");
-            Console.WriteLine($"Depression: {depression}/10");
-            Console.WriteLine("");
-        }
-        else
-        {
-            Console.WriteLine($"{name} is happy");
-            Console.WriteLine($"Depression: {depression}/10");
-            Console.WriteLine("");
-        }
-        if(criminality >= 8)
-        {
-            Console.WriteLine($"{name} is a criminal");
-            Console.WriteLine($"criminality: {criminality}/10");
-            Console.WriteLine("");
-        }
-        else
-        {
-            Console.WriteLine($"{name} is calm");
-            Console.WriteLine($"criminality: {criminality}/10");
-            Console.WriteLine("");
-        }
-        if(hunger >= 50)
-        {
-            Console.WriteLine($"{name} is hungry");
-            Console.WriteLine($"Hunger: {hunger}/100");
-            Console.WriteLine("");
-        }
-        else
-        {
-            Console.WriteLine($"{name} is pleased");
-            Console.WriteLine($"Hunger: {hunger}/100");
-            Console.WriteLine("");
-        }
-        if(isAlive == true)
+        Console.WriteLine($"Boredom: {boredom}/200");
+        Console.WriteLine("");
+        Console.WriteLine($"Depression: {depression}/10");
+        Console.WriteLine("");
+        Console.WriteLine($"criminality: {criminality}/{maxCrime}");
+        Console.WriteLine("");
+        Console.WriteLine($"Hunger: {hunger}/100");
+        Console.WriteLine("");
+        Console.WriteLine($"Debt: {loan}");
+    }
+
+    private void PrintAlive()
+    {
+        if (isAlive == true)
         {
             Console.WriteLine($"{name} is alive");
             Console.WriteLine("");
@@ -239,6 +236,7 @@ public class Tomagachi
             Console.WriteLine("");
         }
     }
+
     public void GetAlive()
     {
         if(hunger >= 100)
@@ -246,20 +244,22 @@ public class Tomagachi
             isAlive = false;
         }
     }
-
     public void Game()
     {
         Naming();
         while (isAlive == true)
         {
             PrintStats();
-            Choice();
-            if (choice == "a")
+            if(criminality > 5 && criminality < 10)
             {
-                SayingNo();
-                if(willHeDoIt == true)
+                SayNo();
+            }
+            if(willHeDoIt == true)
+            {
+                Choice();
+                if (choice == "a")
                 {
-                    if(money >= 100)
+                    if (money >= 100)
                     {
                         Feed();
                     }
@@ -268,29 +268,13 @@ public class Tomagachi
                         Console.WriteLine("You are too poor");
                     }
                 }
-                else
-                {
-                    Console.WriteLine($"{name} says no");
-                }
-            }
-            else if (choice == "b")
-            {
-                SayingNo();
-                if(willHeDoIt == true)
+                else if (choice == "b")
                 {
                     Hi();
                 }
-                else
+                else if (choice == "c")
                 {
-                    Console.WriteLine($"{name} says no");
-                }
-            }
-            else if (choice == "c")
-            {
-                SayingNo();
-                if(willHeDoIt == true)
-                {
-                    if(money >= 200)
+                    if (money >= 200)
                     {
                         Teach(word);
                     }
@@ -299,17 +283,10 @@ public class Tomagachi
                         Console.WriteLine("You are too poor");
                     }
                 }
-                else
+                else if (choice == "d")
                 {
-                    Console.WriteLine($"{name} says no");
-                }
-            }
-            else if (choice == "d")
-            {
-                SayingNo();
-                if(willHeDoIt == true)
-                {
-                    if(money >= 50)
+
+                    if (money >= 50)
                     {
                         Play();
                     }
@@ -318,30 +295,59 @@ public class Tomagachi
                         Console.WriteLine("You are too poor");
                     }
                 }
+                else if (choice == "e")
+                {
+                    Wait();
+                }
+                else if (choice == "f" && loan == 0)
+                {
+                    Loan();
+                }
                 else
                 {
-                    Console.WriteLine($"{name} says no");
+                    WrongAnswers();
                 }
-            }
-            else if(choice == "e")
-            {
-                Wait();
-            }
-            else if(choice == "f")
-            {
-                Loan();
+                Console.ReadLine();
             }
             else
             {
-                WrongAnswers();
+                Console.WriteLine($"{name} doesn't want to do anything");
             }
-            Console.ReadLine();
-
             Tick();
             GetAlive();
             Console.Clear();
+            CrimeClass();
+            PrintAlive();
         }
         Console.ReadLine();
+    }
+
+    private void CrimeClass()
+    {
+        while (criminality == 10 && choosenTheWay == false && crimeClass != "a" && crimeClass != "b" && crimeClass != "c")
+        {
+            Console.WriteLine("Choose one of the criminal classes");
+            Console.WriteLine("A: Illegal Gambler (25% chance to triple money, 50% chance to lose 50% money)");
+            Console.WriteLine("B: Drug Kingpin (+50 $ per round)");
+            Console.WriteLine("C: Homicidal Maniac (depression is not an issue, lose 50 $ each round)");
+            crimeClass = Console.ReadLine();
+            if (crimeClass == "a")
+            {
+                crimeClass = "Illegal Gambler";
+                choosenTheWay = true;
+            }
+            else if (crimeClass == "b")
+            {
+                crimeClass = "Drug Kingpin";
+                choosenTheWay = true;
+            }
+            else if (crimeClass == "c")
+            {
+                crimeClass = "Homicidal Maniac";
+                choosenTheWay = true;
+            }
+            Console.Clear();
+        }
     }
 
     private void WrongAnswers()
@@ -353,18 +359,29 @@ public class Tomagachi
     {
         Console.WriteLine("write your Tomagachis name");
         name = Console.ReadLine();
+        if(name == "Benny" || name == "benny")
+        {
+            money += 2000;
+        }
         Console.Clear();
     }
 
     private void Choice()
     {
         Console.WriteLine("Choose what to do");
-        Console.WriteLine($"A: Feed {name}");
-        Console.WriteLine($"B: Talk with {name}");
-        Console.WriteLine($"C: Teach {name} a word");
-        Console.WriteLine($"D: Play with {name}");
-        Console.WriteLine("E: Wait");
-        Console.WriteLine("E: Loan");
+        Console.WriteLine($"A: Feed {name} (-100 $)");
+        Console.WriteLine($"B: Talk with {name} (+50 $)");
+        Console.WriteLine($"C: Teach {name} a word (-200 $)");
+        Console.WriteLine($"D: Play with {name} (-50 $)");
+        Console.WriteLine("E: Wait (+250 $)");
+        if(loan == 0)
+        {
+            Console.WriteLine("F: Loan (+1000 $)");
+        }
+        else
+        {
+            Console.WriteLine("Can't loan because you havent paid off your debt");
+        }
         choice = Console.ReadLine().ToLower();
         Console.Clear();
     }
