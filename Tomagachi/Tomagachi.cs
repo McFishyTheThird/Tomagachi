@@ -57,10 +57,7 @@ public class Tomagachi
         {
             criminality = 0;
         }
-        if(crimeClass != "Homicidal Maniac")
-        {
-            depression++;
-        }
+        depression++;
         money -= 200;
     }
     public void Tick()
@@ -82,10 +79,7 @@ public class Tomagachi
             money -= money * loan/1500;
             loan -= 100;
         }
-        if(crimeClass != "Homicidal Maniac")
-        {
-            depression++;
-        }
+        depression++;
         if(choice != "b" && choice != "c")
         {
             if (depression < 3)
@@ -130,6 +124,7 @@ public class Tomagachi
         if(crimeClass == "Homicidal Maniac")
         {
             money -= 50;
+            depression = 0;
         }
         if(crimeClass == "Illegal Gambler")
         {
@@ -151,11 +146,7 @@ public class Tomagachi
         if(playtime == 3)
         {
             Console.WriteLine("You throw a ball that hits {name} in the face");
-
-            if(crimeClass != "Homicidal Maniac")
-            {
-                depression++;
-            }
+            depression++;
         }
         else
         {
