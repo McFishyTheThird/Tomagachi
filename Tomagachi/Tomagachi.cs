@@ -6,6 +6,8 @@ public class Tomagachi
     private int boredom = 0;
     private int criminality = 0;
     private int depression = 0;
+    private int money = 1000;
+    private int loan = 0;
     private List<string> words = new List<string>();
     private bool isAlive = true;
     private Random generator = new();
@@ -23,6 +25,7 @@ public class Tomagachi
         {
             hunger = 0;
         }
+        money -= 100;
     }
     public void Hi()
     {
@@ -37,6 +40,7 @@ public class Tomagachi
             boredom -= 60;
 
         }
+        money += 50;
     }
     public void Teach(int word)
     {
@@ -50,6 +54,7 @@ public class Tomagachi
         {
             criminality = 0;
         }
+        money -= 200;
     }
     public void Tick()
     {
@@ -64,6 +69,11 @@ public class Tomagachi
             {
                 hunger += 10 * boredom/100;
             }
+        }
+        if (loan > 0)
+        {
+            money = money * loan/100;
+            loan -= 100;
         }
         if(choice == "c")
         {
@@ -120,6 +130,7 @@ public class Tomagachi
                 willHeDoIt = false;
             }
         }
+        money -= 50;
     }
     public void Play()
     {
@@ -136,6 +147,10 @@ public class Tomagachi
 
             depression -= 3;
             boredom -= 20;
+            if(depression <= 0)
+            {
+                depression = 0;
+            }
         }
         if(boredom < 100)
         {
@@ -146,9 +161,25 @@ public class Tomagachi
         {
             hunger += 10 * boredom/100;
         }
+        money -= 50;
+    }
+    private void Wait()
+    {
+        Console.WriteLine("You wait and get some cash");
+        Console.ReadLine();
+        money += 250;
+    }
+
+    private void Loan()
+    {
+        Console.WriteLine("You loan some money");
+        Console.ReadLine();
+        money += 1000;
+        loan += 1000;
     }
     public void PrintStats()
     {
+        Console.WriteLine($"Money: {money}");
         if(boredom >= 100)
         {
             Console.WriteLine($"{name} is bored");
@@ -228,7 +259,14 @@ public class Tomagachi
                 SayingNo();
                 if(willHeDoIt == true)
                 {
-                    Feed();
+                    if(money >= 100)
+                    {
+                        Feed();
+                    }
+                    else
+                    {
+                        Console.WriteLine("You are too poor");
+                    }
                 }
                 else
                 {
@@ -252,7 +290,14 @@ public class Tomagachi
                 SayingNo();
                 if(willHeDoIt == true)
                 {
-                    Teach(word);
+                    if(money >= 200)
+                    {
+                        Teach(word);
+                    }
+                    else
+                    {
+                        Console.WriteLine("You are too poor");
+                    }
                 }
                 else
                 {
@@ -264,12 +309,27 @@ public class Tomagachi
                 SayingNo();
                 if(willHeDoIt == true)
                 {
-                    Play();
+                    if(money >= 50)
+                    {
+                        Play();
+                    }
+                    else
+                    {
+                        Console.WriteLine("You are too poor");
+                    }
                 }
                 else
                 {
                     Console.WriteLine($"{name} says no");
                 }
+            }
+            else if(choice == "e")
+            {
+                Wait();
+            }
+            else if(choice == "f")
+            {
+                Loan();
             }
             else
             {
@@ -303,6 +363,8 @@ public class Tomagachi
         Console.WriteLine($"B: Talk with {name}");
         Console.WriteLine($"C: Teach {name} a word");
         Console.WriteLine($"D: Play with {name}");
+        Console.WriteLine("E: Wait");
+        Console.WriteLine("E: Loan");
         choice = Console.ReadLine().ToLower();
         Console.Clear();
     }
